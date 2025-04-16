@@ -21,12 +21,15 @@ const ConfigForm: React.FC<ConfigFormProps> = ({
   setError,
 }) => {
   const handleConfigChange = (key: keyof ClickHouseConfig, value: string) => {
-    if (key === "database" && value !== "default") {
-      setError("Database must be 'default'");
-      return;
+    if (key === "database") {
+      if (value !== "default") {
+        setError("Database must be 'default'");
+        return;
+      } else {
+        setError(""); // Clear error if corrected
+      }
     }
-
-    setChConfig({ ...chConfig, [key]: value });
+    setChConfig((prev) => ({ ...prev, [key]: value }));
   };
 
   return (
@@ -35,25 +38,42 @@ const ConfigForm: React.FC<ConfigFormProps> = ({
         ClickHouse Configuration
       </h2>
       <div className="grid grid-cols-1 gap-4">
-        {Object.keys(chConfig).slice(0, -1).map((key) => (
-          <div key={key}>
-            <label className="block text-sm font-medium text-gray-700 capitalize">
-              {key}
-            </label>
-            <input
-              type={key === "password" || key === "jwt" ? "password" : "text"}
-              className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              value={chConfig[key as keyof ClickHouseConfig]}
-              onChange={(e) =>
-                handleConfigChange(
-                  key as keyof ClickHouseConfig,
-                  e.target.value
-                )
-              }
-              disabled={key === "database"}
-            />
-          </div>
-        ))}
+        {Object.entries(chConfig).map(([key, value]) => {
+          if (key === "jwt") return null; // Skip jwt input
+          const isPassword = key === "password";
+          const isDisabled = key === "database";
+          return (
+            <div key={key}>
+              <label
+                htmlFor={key}
+                className="block text-sm font-medium text-gray-700 capitalize"
+              >
+                {key}
+              </label>
+              <input
+                id={key}
+                type={isPassword ? "password" : "text"}
+                autoComplete="off"
+                className={`w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                  isDisabled ? "bg-gray-100 cursor-not-allowed" : ""
+                }`}
+                value={value}
+                onChange={(e) =>
+                  handleConfigChange(
+                    key as keyof ClickHouseConfig,
+                    e.target.value
+                  )
+                }
+                disabled={isDisabled}
+              />
+              {key === "database" && chConfig.database !== "default" && (
+                <p className="text-sm text-red-500 mt-1">
+                  Database must be set to <code>default</code>
+                </p>
+              )}
+            </div>
+          );
+        })}
       </div>
     </div>
   );

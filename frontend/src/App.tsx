@@ -10,6 +10,8 @@ import FlatFileUpload from "./components/FlatFileUpload";
 import FlatFileConnect from "./components/FlatFileConnect";
 import FlatFileTableSelector from "./components/FlatFileTableSelector";
 
+import "./App.css";
+
 export interface ClickHouseConfig {
   host: string;
   port: string;
@@ -82,10 +84,10 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-3xl">
-        <h1 className="text-3xl font-bold text-blue-600 mb-6 text-center">
-          ClickHouse-Flat File Data Ingestion
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-6">
+      <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-4xl space-y-6 border border-gray-200">
+        <h1 className="text-4xl font-semibold text-gray-800 text-center tracking-tight">
+          ClickHouse + Flat File Ingestion
         </h1>
 
         <StatusDisplay
@@ -94,12 +96,12 @@ const App: React.FC = () => {
           recordCount={apiState.recordCount}
         />
 
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Source
+        <div>
+          <label className="block text-sm font-medium text-gray-600 mb-1">
+            Data Source
           </label>
           <select
-            className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={source}
             onChange={(e) =>
               setSource(e.target.value as "clickhouse" | "flatfile")
@@ -119,7 +121,7 @@ const App: React.FC = () => {
         />
 
         {source === "flatfile" && (
-          <>
+          <div className="space-y-4">
             <FlatFileConnect
               handleConnect={() => {
                 connect("clickhouse", chConfig, file?.name || "");
@@ -153,7 +155,7 @@ const App: React.FC = () => {
               selectedTable={selectedTable}
               setApiState={setApiState}
             />
-          </>
+          </div>
         )}
 
         {source === "clickhouse" && (
@@ -192,7 +194,7 @@ const App: React.FC = () => {
         )}
 
         {source === "clickhouse" && selectedColumns.length > 0 && (
-          <div className="flex space-x-4 mb-6">
+          <div className="flex flex-wrap gap-4 mb-6 justify-center">
             <button
               onClick={() =>
                 preview(
@@ -204,7 +206,7 @@ const App: React.FC = () => {
                   fileContent
                 )
               }
-              className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition disabled:bg-gray-400"
+              className="bg-green-500 hover:bg-green-600 text-white font-medium px-5 py-2.5 rounded-lg transition disabled:bg-gray-400"
               disabled={apiState.status === "Fetching preview..."}
             >
               Preview
@@ -220,7 +222,7 @@ const App: React.FC = () => {
                   fileContent
                 )
               }
-              className="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition disabled:bg-gray-400"
+              className="bg-purple-500 hover:bg-purple-600 text-white font-medium px-5 py-2.5 rounded-lg transition disabled:bg-gray-400"
               disabled={apiState.status === "Ingesting..."}
             >
               Start Ingestion
